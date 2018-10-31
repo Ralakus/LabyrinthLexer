@@ -16,7 +16,7 @@
 typedef struct lab_lexer_token_t {
 
     int id;
-    const char* data;
+    char* data;
 
 } lab_lexer_token_t;
 
@@ -59,6 +59,18 @@ LAB_FORCEINLINE void lab_lexer_token_container_init(lab_lexer_token_container_t*
     container->alloc_count = 0;
     container->count  = 0;
     container->tokens = NULL;
+}
+
+LAB_FORCEINLINE void lab_lexer_token_container_free(lab_lexer_token_container_t* container) {
+    if(container->tokens==NULL) {
+    } else {
+        for(size_t i = 0; i < container->count; i++) {
+            free(container->tokens[i].data);
+        }
+        free(container->tokens);
+    }
+    container->alloc_count = 0;
+    container->count = 0;
 }
 
 #define NOT_SO_FAST_CEIL(x) ((float)(long)((x)+1))
