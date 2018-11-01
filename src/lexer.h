@@ -20,13 +20,24 @@ typedef struct lab_lexer_iterator_t {
     size_t line;
     size_t column;
 } lab_lexer_iterator_t;
+// ^ iterator contains place in file and it's line and column, use lab_lexer_iter_next to iterate
 
-typedef struct lab_lexer_rules_t     lab_lexer_rules_t;
-//             ^ contains lexer rules, id est what to look for and callback
 typedef lab_lexer_token_t  (*lab_lexer_callback_t)(const char* code, lab_lexer_iterator_t* iter, size_t max_length, void* user_data);
 //             ^ returns token type by int id
 
-extern lab_lexer_rules_t* lab_lexer_rules_new();
+typedef struct lab_lexer_rule_t {
+    const char*          rule;
+    lab_lexer_callback_t callback;
+} lab_lexer_rule_t;
+// ^ contains the rule string and it's function callback
+
+typedef struct lab_lexer_rules_t {
+    int count;
+    lab_lexer_rule_t* rules;
+} lab_lexer_rules_t;
+// ^ contains lexer rules, id est what to look for and callback
+
+extern int lab_lexer_rules_init(lab_lexer_rules_t* rules);
 //         ^ intializes new rules struct
 extern int lab_lexer_rules_free(lab_lexer_rules_t* rules);
 //         ^ frees rules struct

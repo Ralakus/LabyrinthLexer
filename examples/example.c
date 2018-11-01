@@ -260,15 +260,17 @@ lab_lexer_token_t eof_callback(const char* code, lab_lexer_iterator_t* iter, siz
 
 int main(int argc, char* argv[]) {
 
-    lab_lexer_rules_t* rules = lab_lexer_rules_new();
+    lab_lexer_rules_t rules;
     lab_lexer_token_container_t tokens;
 
-    lab_lexer_add_rule(rules, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm", alpha_callback);
-    lab_lexer_add_rule(rules, " \n\t\r", whitespace_callback);
-    lab_lexer_add_rule(rules, "1234567890", numeric_callback);
-    lab_lexer_add_rule(rules, "()[]{},:;", symbol_callback);
-    lab_lexer_add_rule(rules, "+-*/=^&<>|", operator_callback);
-    lab_lexer_add_rule(rules, "\"\'", string_callback);
+    lab_lexer_rules_init(&rules);
+
+    lab_lexer_add_rule(&rules, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm", alpha_callback);
+    lab_lexer_add_rule(&rules, " \n\t\r", whitespace_callback);
+    lab_lexer_add_rule(&rules, "1234567890", numeric_callback);
+    lab_lexer_add_rule(&rules, "()[]{},:;", symbol_callback);
+    lab_lexer_add_rule(&rules, "+-*/=^&<>|", operator_callback);
+    lab_lexer_add_rule(&rules, "\"\'", string_callback);
 
     lab_lexer_token_container_init(&tokens);
     lab_lexer_lex(&tokens, 
@@ -277,7 +279,7 @@ int main(int argc, char* argv[]) {
     "   let y = \"Hello world!\"" \
     "   return 0;" \
     "}"
-    , 0, rules, NULL);
+    , 0, &rules, NULL);
 
     lab_noticeln("Tokens for example");
     for(size_t j = 0; j < tokens.count; j++) {
@@ -289,7 +291,7 @@ int main(int argc, char* argv[]) {
 
     lab_lexer_token_container_free(&tokens);
 
-    lab_lexer_rules_free(rules);
+    lab_lexer_rules_free(&rules);
 
     return 0;
 

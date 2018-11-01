@@ -42,14 +42,13 @@ int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer
     return 0;
 }
 
-lab_lexer_rules_t* lab_lexer_rules_new() {
-    lab_lexer_rules_t* rules = (lab_lexer_rules_t*)malloc(sizeof(lab_lexer_rules_t));
+int lab_lexer_rules_init(lab_lexer_rules_t* rules) {
     if(rules==NULL) {
-        return NULL;
+        return 1;
     } else {
         rules->count = 0;
         rules->rules = NULL;
-        return rules;
+        return 0;
     }
 }
 
