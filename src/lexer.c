@@ -5,16 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct _lab_lexer_rule_t {
-    const char*          rule;
-    lab_lexer_callback_t callback;
-} _lab_lexer_rule_t;
-
-struct lab_lexer_rules_t {
-    int count;
-    _lab_lexer_rule_t* rules;
-};
-
 #define NOT_SO_FAST_CEIL(x) ((float)(long)((x)+1))
 
 int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer_token_t token, const lab_lexer_iterator_t* pos, size_t max_code_len) {
@@ -27,9 +17,9 @@ int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer
     }
 
     if(container->tokens == NULL) { 
-        container->tokens = (lab_lexer_token_t*)malloc(sizeof(_lab_lexer_rule_t) * container->alloc_count);
+        container->tokens = (lab_lexer_token_t*)malloc(sizeof(lab_lexer_rule_t) * container->alloc_count);
     } else {
-        container->tokens = (lab_lexer_token_t*)realloc(container->tokens, sizeof(_lab_lexer_rule_t) * container->alloc_count);
+        container->tokens = (lab_lexer_token_t*)realloc(container->tokens, sizeof(lab_lexer_rule_t) * container->alloc_count);
     }
 
     if(container->tokens == NULL) {
@@ -94,9 +84,9 @@ int lab_lexer_add_rule(lab_lexer_rules_t* rules, const char* rule, lab_lexer_cal
     ++rules->count;
 
     if(rules->rules == NULL) {
-        rules->rules = (_lab_lexer_rule_t*)malloc(sizeof(_lab_lexer_rule_t) * rules->count);
+        rules->rules = (lab_lexer_rule_t*)malloc(sizeof(_lab_lexer_rule_t) * rules->count);
     } else {
-        rules->rules = (_lab_lexer_rule_t*)realloc(rules->rules, sizeof(_lab_lexer_rule_t) * rules->count);
+        rules->rules = (lab_lexer_rule_t*)realloc(rules->rules, sizeof(_lab_lexer_rule_t) * rules->count);
     }
 
     if(rules->rules == NULL) {
