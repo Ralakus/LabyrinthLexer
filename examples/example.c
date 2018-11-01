@@ -258,209 +258,38 @@ lab_lexer_token_t eof_callback(const char* code, lab_lexer_iterator_t* iter, siz
     return lab_lexer_token_make((int)tok_eof, NULL);
 }
 
-int custom_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t code_len, void* user_data) {
-    if(code_len == 0) {
-        code_len = strlen(code);
-    }
-
-    lab_lexer_iterator_t pos;
-    pos.iter   = 0;
-    pos.line   = 1;
-    pos.column = 0;
-
-    for (pos.iter = 0; pos.iter < code_len; lab_lexer_iter_next(code, &pos)) {
-        
-        char cur_char = code[pos.iter];
-
-        if(isalpha(cur_char)) {
-            lab_token_container_append(tokens, alpha_callback(code, &pos, code_len, user_data), &pos, code_len);
-        } else if (isdigit(cur_char) || cur_char == '.') {
-           lab_token_container_append(tokens, numeric_callback(code, &pos, code_len, user_data), &pos, code_len);
-        } else if(isspace(cur_char)) {
-            lab_token_container_append(tokens, whitespace_callback(code, &pos, code_len, user_data), &pos, code_len);
-        } else if (cur_char=='(' || cur_char==')' || cur_char=='[' || cur_char==']' || cur_char=='{' || cur_char=='}' ||
-                   cur_char==',' || cur_char==':' || cur_char==';') {
-            lab_token_container_append(tokens, symbol_callback(code, &pos, code_len, user_data), &pos, code_len);
-        } else if (cur_char=='+' || cur_char=='-' || cur_char=='*' || cur_char=='/' || cur_char=='=' || cur_char=='^' ||
-                   cur_char=='&' || cur_char=='<' || cur_char=='>' || cur_char=='|') {
-            lab_token_container_append(tokens, operator_callback(code, &pos, code_len, user_data), &pos, code_len);
-        } else if(cur_char=='\"' || cur_char=='\'') {
-            lab_token_container_append(tokens, string_callback(code, &pos, code_len, user_data), &pos, code_len);
-        }
-
-    }
-    return 0;
-}
-
 int main(int argc, char* argv[]) {
 
-    clock_t start, end;
-    double lex_read_files_time, lex_rule_add_time, lex_time, lex_rule_clear_time, lex_total_time;
-
-    size_t file_count           = argc - 1;
-    char** file_names           = NULL;
-    size_t* file_name_sizes     = NULL;
-    char** file_contents        = NULL;
-    size_t* file_contents_sizes = NULL;
-
-    start = clock();
-
-    if(argc > 1) {
-        FILE* cur_file = NULL;
-        file_names          = (char**)malloc(sizeof(char*)  * file_count);
-        file_name_sizes     = (size_t*)malloc(sizeof(size_t) * file_count);
-        file_contents       = (char**)malloc(sizeof(char*)  * file_count);
-        file_contents_sizes = (size_t*)malloc(sizeof(size_t) * file_count);
-
-        if(file_names==NULL) {
-            lab_errorln("Failed to allocate file name buffer!");
-            free(file_names);
-            free(file_name_sizes);
-            free(file_contents);
-            free(file_contents_sizes);
-            return 1;
-        } else if(file_name_sizes==NULL) {
-            lab_errorln("Failed to allocate file name size buffer!");
-            free(file_names);
-            free(file_name_sizes);
-            free(file_contents);
-            free(file_contents_sizes);
-            return 1;
-        } else if(file_contents==NULL) {
-            lab_errorln("Failed to allocate file contents buffer!");
-            free(file_names);
-            free(file_name_sizes);
-            free(file_contents);
-            free(file_contents_sizes);
-            return 1;
-        } else if(file_contents_sizes==NULL) {
-            lab_errorln("Failed to allocate file contents size buffer!");
-            free(file_names);
-            free(file_name_sizes);
-            free(file_contents);
-            free(file_contents_sizes);
-            return 1;
-        }
-
-        for(int i = 1; i < argc; i++) {
-
-            file_name_sizes[i-1] = strlen(argv[i])+1;
-            file_names[i-1] = (char*)malloc(file_name_sizes[i-1]);
-            if(file_names[i-1]==NULL) {
-                lab_errorln("Failed to allocate file name for file: \"%s\"!", argv[i]);
-                for(int j = 0; j < file_count; j++) {
-                    free(file_names[j]);
-                    free(file_contents[j]);
-                }
-                free(file_names);
-                free(file_name_sizes);
-                free(file_contents);
-                free(file_contents_sizes);
-                return 1;
-            }
-
-            file_names[i-1][file_name_sizes[i-1]-1] = '\0';
-            memcpy(file_names[i-1], argv[i], file_name_sizes[i-1]-1);
-
-            cur_file = fopen(argv[i], "r");
-
-            if(cur_file==NULL) {
-                lab_errorln("Failed to openfile: \"%s\"!", argv[i]);
-                for(int j = 0; j < file_count; j++) {
-                    free(file_names[j]);
-                    free(file_contents[j]);
-                }
-                free(file_names);
-                free(file_name_sizes);
-                free(file_contents);
-                free(file_contents_sizes);
-                return 1;
-            }
-
-            fseek(cur_file, 0, SEEK_END);
-            file_contents_sizes[i-1] = ftell(cur_file)+1;
-            fseek(cur_file, 0, SEEK_SET);
-            file_contents[i-1] = (char*)malloc(file_contents_sizes[i-1]);
-
-            if(file_contents[i-1]==NULL) {
-                lab_errorln("Failed to allocate file buffer for file: \"%s\"!", argv[i]);
-                for(int j = 0; j < file_count; j++) {
-                    free(file_names[j]);
-                    free(file_contents[j]);
-                }
-                free(file_names);
-                free(file_name_sizes);
-                free(file_contents);
-                free(file_contents_sizes);
-                return 1;
-            }
-
-            file_contents[i-1][file_contents_sizes[i-1]-1] = '\0';
-
-            fread(file_contents[i-1], 1, file_contents_sizes[i-1], cur_file);
-            fclose(cur_file);
-        }
-    }
-    else {
-        lab_errorln("No input files!");
-        return 1;
-    }
-
-    end = clock();
-
-    lex_read_files_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-    
-    start = clock();
-
-    //lab_lexer_rules_t* rules = lab_lexer_rules_new();
+    lab_lexer_rules_t* rules = lab_lexer_rules_new();
     lab_lexer_token_container_t tokens;
 
-    //lab_lexer_add_rule(rules, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm", alpha_callback);
-    //lab_lexer_add_rule(rules, " \n\t\r", whitespace_callback);
-    //lab_lexer_add_rule(rules, "1234567890", numeric_callback);
-    //lab_lexer_add_rule(rules, "()[]{},:;", symbol_callback);
-    //lab_lexer_add_rule(rules, "+-*/=^&<>|", operator_callback);
-    //lab_lexer_add_rule(rules, "\"\'", string_callback);
+    lab_lexer_add_rule(rules, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm", alpha_callback);
+    lab_lexer_add_rule(rules, " \n\t\r", whitespace_callback);
+    lab_lexer_add_rule(rules, "1234567890", numeric_callback);
+    lab_lexer_add_rule(rules, "()[]{},:;", symbol_callback);
+    lab_lexer_add_rule(rules, "+-*/=^&<>|", operator_callback);
+    lab_lexer_add_rule(rules, "\"\'", string_callback);
 
-    end = clock();
+    lab_lexer_token_container_init(&tokens);
+    lab_lexer_lex(&tokens, 
+    "Func main(argc: Int16, argv: Str[]): Int16 {" \
+    "   let x = 5;" \
+    "   let y = \"Hello world!\"" \
+    "   return 0;" \
+    "}"
+    , 0, rules, NULL);
 
-    lex_rule_add_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-
-    start = clock();
-
-    for(size_t i = 0; i < file_count; i++) {
-        lab_lexer_token_container_init(&tokens);
-        //lab_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i]-1, rules, NULL);
-        custom_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i]-1, NULL);
-
-        lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
-        /*for(size_t j = 0; j < tokens.count; j++) {
-            char* tok_str = tok_to_string((tokens_e)tokens.tokens[j].id);
-            lab_println("Token: %s: %s", tok_str, tokens.tokens[j].data);
-            free(tok_str);
-        }*/
-        lab_noticeln("END");
-
-        lab_lexer_token_container_free(&tokens);
+    lab_noticeln("Tokens for example");
+    for(size_t j = 0; j < tokens.count; j++) {
+        char* tok_str = tok_to_string((tokens_e)tokens.tokens[j].id);
+        lab_println("Token: %s: %s", tok_str, tokens.tokens[j].data);
+        free(tok_str);
     }
+    lab_noticeln("END");
 
-    end = clock();
+    lab_lexer_token_container_free(&tokens);
 
-    lex_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-
-    start = clock();
-    //lab_lexer_rules_free(rules);
-    end  = clock();
-
-    lex_rule_clear_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-
-    lex_total_time = lex_read_files_time + lex_rule_add_time + lex_time + lex_rule_clear_time;
-
-    lab_successln("Read files time %fms", lex_read_files_time * 1000);
-    lab_successln("Rule add time: %fms", lex_rule_add_time * 1000);
-    lab_successln("Lex time %fms", lex_time * 1000);
-    lab_successln("Rule clear time %fms", lex_rule_clear_time * 1000);
-    lab_successln("Total time: %fms", lex_total_time * 1000);
+    lab_lexer_rules_free(rules);
 
     return 0;
 
