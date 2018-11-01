@@ -84,9 +84,9 @@ int lab_lexer_add_rule(lab_lexer_rules_t* rules, const char* rule, lab_lexer_cal
     ++rules->count;
 
     if(rules->rules == NULL) {
-        rules->rules = (lab_lexer_rule_t*)malloc(sizeof(_lab_lexer_rule_t) * rules->count);
+        rules->rules = (lab_lexer_rule_t*)malloc(sizeof(lab_lexer_rule_t) * rules->count);
     } else {
-        rules->rules = (lab_lexer_rule_t*)realloc(rules->rules, sizeof(_lab_lexer_rule_t) * rules->count);
+        rules->rules = (lab_lexer_rule_t*)realloc(rules->rules, sizeof(lab_lexer_rule_t) * rules->count);
     }
 
     if(rules->rules == NULL) {
