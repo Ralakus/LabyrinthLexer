@@ -119,7 +119,7 @@ lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, s
 
                 for(size_t j = 0;; j++) {
 
-                    if(j >= iter->iter - (begin_iter.iter + 1)) {
+                    if(j >= iter->iter - (begin_iter.iter + 1) && reserved[i][j]==(code + begin_iter.iter)[j]) {
 
                         return lab_lexer_token_make((int)reserved_types[i], NULL);
 
