@@ -275,9 +275,10 @@ int main(int argc, char* argv[]) {
     lab_lexer_token_container_init(&tokens);
     lab_lexer_lex(&tokens, 
     "Func main(argc: Int16, argv: Str[]): Int16 {" \
-    "   let x = 5;" \
-    "   let y = \"Hello world!\"" \
-    "   return 0;" \
+    "   let x = 5;"                                \
+    "   let y = \"Hello world!\""                  \
+    "   println y;"                                \
+    "   return 0;"                                 \
     "}"
     , 0, &rules, NULL);
 
