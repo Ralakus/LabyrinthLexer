@@ -123,7 +123,10 @@ int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t 
                 }
 
                 if(cur_char==rules->rules[j].rule[k]) {
-                    lab_token_container_append(tokens, rules->rules[j].callback(code, &pos, code_len, user_data), &pos, code_len);
+                    lab_lexer_token_t temp_tok = rules->rules[j].callback(code, &pos, code_len, user_data);
+                    if(temp_tok.id >= 0) {
+                        lab_token_container_append(tokens, temp_tok, &pos, code_len);
+                    }
                     found_callback = 1;
                     break;
                 }

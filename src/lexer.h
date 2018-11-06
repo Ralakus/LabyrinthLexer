@@ -7,6 +7,10 @@ typedef struct lab_lexer_token_t {
     char* data;
 } lab_lexer_token_t;
 // ^ Contains the id of a token and any data it might need, the data is freed when lab_lexer_token_container_free is called
+/*
+    The ID can only be positive as any negative tokens will get ignored by the lexer and not added to the token container.
+    This is so the user can decide whether to ignore a token or not rather than having to always return.
+*/
 
 typedef struct lab_lexer_token_container_t {
     size_t alloc_count;
