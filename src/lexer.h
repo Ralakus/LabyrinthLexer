@@ -5,6 +5,8 @@
 typedef struct lab_lexer_token_t {
     int id;
     char* data;
+    size_t line;    // The line it was defined on
+    size_t column;  // The column it was defined on
 } lab_lexer_token_t;
 // ^ Contains the id of a token and any data it might need, the data is freed when lab_lexer_token_container_free is called
 /*
@@ -53,7 +55,7 @@ extern int lab_lexer_token_container_free(lab_lexer_token_container_t* container
 extern int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer_token_t token, const lab_lexer_iterator_t* pos, size_t max_code_len);
 //         ^ appends a token to a token container
 
-extern lab_lexer_token_t lab_lexer_token_make(int id, char* data);
+extern lab_lexer_token_t lab_lexer_token_make(int id, char* data, lab_lexer_iterator_t* pos);
 //                       ^ makes new token with id and data
 
 extern int lab_lexer_add_rule(lab_lexer_rules_t*     rules, const char* rule, lab_lexer_callback_t     callback);

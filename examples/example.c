@@ -121,7 +121,7 @@ lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, s
 
                     if(j >= iter->iter - (begin_iter.iter + 1) && reserved[i][j]==(code + begin_iter.iter)[j]) {
 
-                        return lab_lexer_token_make((int)reserved_types[i], NULL);
+                        return lab_lexer_token_make((int)reserved_types[i], NULL, iter);
 
                     } else if(reserved[i][j]=='\0') {
                         break;
@@ -146,21 +146,20 @@ lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, s
 
             }
 
-            return lab_lexer_token_make((int)tok_identifier, ident);
+            return lab_lexer_token_make((int)tok_identifier, ident, iter);
         }
     }
-    return lab_lexer_token_make((int)tok_nil, NULL);
+    return lab_lexer_token_make((int)tok_nil, NULL, iter);
 }
 
 lab_lexer_token_t whitespace_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
     char type = code[iter->iter];
-    char* type_name = NULL;
     switch (type) {
-        case ' ' : return lab_lexer_token_make((int)tok_whitespace_space, NULL);
-        case '\t': return lab_lexer_token_make((int)tok_whitespace_tab, NULL);
-        case '\n': return lab_lexer_token_make((int)tok_whitespace_newline, NULL);
-        case '\r': return lab_lexer_token_make((int)tok_whitespace_return, NULL);
-        default  : return lab_lexer_token_make((int)tok_nil, type_name);;
+        case ' ' : return lab_lexer_token_make((int)tok_whitespace_space,   NULL, iter);
+        case '\t': return lab_lexer_token_make((int)tok_whitespace_tab,     NULL, iter);
+        case '\n': return lab_lexer_token_make((int)tok_whitespace_newline, NULL, iter);
+        case '\r': return lab_lexer_token_make((int)tok_whitespace_return,  NULL, iter);
+        default  : return lab_lexer_token_make((int)tok_nil,                NULL, iter);
     }
 }
 
@@ -183,40 +182,40 @@ lab_lexer_token_t numeric_callback(const char* code, lab_lexer_iterator_t* iter,
 
             }
 
-            return lab_lexer_token_make((int)tok_number, num);
+            return lab_lexer_token_make((int)tok_number, num, iter);
         }
     }
-    return lab_lexer_token_make((int)tok_nil, NULL);
+    return lab_lexer_token_make((int)tok_nil, NULL, iter);
 }
 
 lab_lexer_token_t symbol_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
     switch(code[iter->iter]) {
-        case '(': return lab_lexer_token_make((int)tok_lparen,    NULL);
-        case ')': return lab_lexer_token_make((int)tok_rparen,    NULL);
-        case '[': return lab_lexer_token_make((int)tok_lbracket,  NULL);
-        case ']': return lab_lexer_token_make((int)tok_rbracket,  NULL);
-        case '{': return lab_lexer_token_make((int)tok_lcurley,   NULL);
-        case '}': return lab_lexer_token_make((int)tok_rcurley,   NULL);
-        case ',': return lab_lexer_token_make((int)tok_comma,     NULL);
-        case ':': return lab_lexer_token_make((int)tok_colon,     NULL);
-        case ';': return lab_lexer_token_make((int)tok_semicolon, NULL);
-        default:  return lab_lexer_token_make((int)tok_nil,       NULL);
+        case '(': return lab_lexer_token_make((int)tok_lparen,    NULL, iter);
+        case ')': return lab_lexer_token_make((int)tok_rparen,    NULL, iter);
+        case '[': return lab_lexer_token_make((int)tok_lbracket,  NULL, iter);
+        case ']': return lab_lexer_token_make((int)tok_rbracket,  NULL, iter);
+        case '{': return lab_lexer_token_make((int)tok_lcurley,   NULL, iter);
+        case '}': return lab_lexer_token_make((int)tok_rcurley,   NULL, iter);
+        case ',': return lab_lexer_token_make((int)tok_comma,     NULL, iter);
+        case ':': return lab_lexer_token_make((int)tok_colon,     NULL, iter);
+        case ';': return lab_lexer_token_make((int)tok_semicolon, NULL, iter);
+        default:  return lab_lexer_token_make((int)tok_nil,       NULL, iter);
     }
 }
 
 lab_lexer_token_t operator_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
     switch(code[iter->iter]) {
-        case '+': return lab_lexer_token_make((int)tok_operator_plus,         NULL);
-        case '-': return lab_lexer_token_make((int)tok_operator_minus,        NULL);
-        case '*': return lab_lexer_token_make((int)tok_operator_mul,          NULL);
-        case '/': return lab_lexer_token_make((int)tok_operator_div,          NULL);
-        case '=': return lab_lexer_token_make((int)tok_operator_equals,       NULL);
-        case '^': return lab_lexer_token_make((int)tok_operator_xor,          NULL);
-        case '<': return lab_lexer_token_make((int)tok_operator_lesst,        NULL);
-        case '>': return lab_lexer_token_make((int)tok_operator_greatert,     NULL);
-        case '|': return lab_lexer_token_make((int)tok_operator_or,           NULL);
-        case '!': return lab_lexer_token_make((int)tok_operator_not,          NULL);
-        default:  return lab_lexer_token_make((int)tok_nil,                   NULL);
+        case '+': return lab_lexer_token_make((int)tok_operator_plus,         NULL, iter);
+        case '-': return lab_lexer_token_make((int)tok_operator_minus,        NULL, iter);
+        case '*': return lab_lexer_token_make((int)tok_operator_mul,          NULL, iter);
+        case '/': return lab_lexer_token_make((int)tok_operator_div,          NULL, iter);
+        case '=': return lab_lexer_token_make((int)tok_operator_equals,       NULL, iter);
+        case '^': return lab_lexer_token_make((int)tok_operator_xor,          NULL, iter);
+        case '<': return lab_lexer_token_make((int)tok_operator_lesst,        NULL, iter);
+        case '>': return lab_lexer_token_make((int)tok_operator_greatert,     NULL, iter);
+        case '|': return lab_lexer_token_make((int)tok_operator_or,           NULL, iter);
+        case '!': return lab_lexer_token_make((int)tok_operator_not,          NULL, iter);
+        default:  return lab_lexer_token_make((int)tok_nil,                   NULL, iter);
     }
 }
 
@@ -237,25 +236,25 @@ lab_lexer_token_t string_callback(const char* code, lab_lexer_iterator_t* iter, 
     }
     if(end_index==0) {
         lab_errorln("Failed to find string closing statement for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
-        return lab_lexer_token_make((int)tok_nil, NULL);
+        return lab_lexer_token_make((int)tok_nil, NULL, iter);
     } else {
         char* buffer = (char*)malloc((end_index - begin_index) + 1);
         if(buffer==NULL) {
             lab_errorln("Failed to allocate string buffer for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
-            return lab_lexer_token_make((int)tok_nil, NULL);
+            return lab_lexer_token_make((int)tok_nil, NULL, iter);
         }
         buffer[end_index - begin_index] = '\0';
         memcpy(buffer, code + begin_index + 1, end_index - begin_index);
-        return lab_lexer_token_make(mode == 1 ? (int)tok_string : (int)tok_char, buffer);
+        return lab_lexer_token_make(mode == 1 ? (int)tok_string : (int)tok_char, buffer, iter);
     }
-    return lab_lexer_token_make((int)tok_nil, NULL);
+    return lab_lexer_token_make((int)tok_nil, NULL, iter);
 }
 
 /*
     TODO: Find a way to make the lexer take an a null termination as a rule
 */
 lab_lexer_token_t eof_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
-    return lab_lexer_token_make((int)tok_eof, NULL);
+    return lab_lexer_token_make((int)tok_eof, NULL, iter);
 }
 
 int main(int argc, char* argv[]) {

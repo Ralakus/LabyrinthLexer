@@ -72,10 +72,12 @@ int lab_lexer_token_container_free(lab_lexer_token_container_t* container) {
     return 0;
 }
 
-lab_lexer_token_t lab_lexer_token_make(int id, char* data) {
+lab_lexer_token_t lab_lexer_token_make(int id, char* data, lab_lexer_iterator_t* pos) {
     lab_lexer_token_t token;
-    token.id = id;
-    token.data = data;
+    token.id     = id;
+    token.data   = data;
+    token.line   = pos->line;
+    token.column = pos->column;
     return token;
 }
 
